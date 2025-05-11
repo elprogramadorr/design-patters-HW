@@ -39,6 +39,28 @@ public:
     }
 };
 
+// Clase base Decorator
+class AdoptableDecorator : public Adoptable {
+protected:
+    Adoptable* adoptable;
+public:
+    AdoptableDecorator(Adoptable* a) : adoptable(a) {}
+    string getNombre(){ return adoptable->getNombre(); }
+    int getEdad(){ return adoptable->getEdad(); }
+    void mostrarInformacionGeneral(){ adoptable->mostrarInformacionGeneral(); }
+    bool adoptar(){ return adoptable->adoptar(); }
+};
+
+// Decorator: Mascota Entrenada
+class EntrenadoDecorator : public AdoptableDecorator {
+public:
+    EntrenadoDecorator(Adoptable* a) : AdoptableDecorator(a) {}
+    void mostrarInformacionGeneral() override {
+        AdoptableDecorator::mostrarInformacionGeneral();
+        cout<<"-Entrenado"<<endl;
+    }
+};
+
 class Adoptador {
 public:
     virtual string getNombre()=0;
@@ -115,25 +137,21 @@ public:
 };
 
 int main(){
-    Perro* toby = new Perro("Toby", 13);
-    Perro* max = new Perro("Max", 5);
-    Perro* rex = new Perro("Rex", 8);
+    Adoptable* maxEntrenado = new EntrenadoDecorator(new Perro("Max", 5));
 
-    // Strategy pattern
     Albergue refugio(new OrdenarEdad());
 
-    refugio.agregar(toby);
-    refugio.agregar(max);
-    refugio.agregar(rex);
+    refugio.agregar(new Perro("Toby", 13));
+    refugio.agregar(maxEntrenado);
+    refugio.agregar(new Perro("Rex", 8));
     refugio.listarDisponibles();
 
     Persona* juan = new Persona();
     juan->nombre = "Juan";
 
-    refugio.adoptar(max, juan);
+    refugio.adoptar(maxEntrenado, juan);
 
-    // cout<<"------"<<endl;
-
+    cout << "------" << endl;
     refugio.listarDisponibles();
     
 }
